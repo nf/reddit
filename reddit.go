@@ -31,11 +31,55 @@ type Response struct {
 	}
 }
 
+type Subreddit struct {
+	Name string
+	Items []Item
+}
+
 type Item struct {
 	Title    string
 	URL      string
 	Comments int `json:"num_comments"`
 }
+
+type Comment struct {
+
+}
+
+type Submission struct {
+	Title string
+	LinkURL string
+	Comments []Comment
+}
+
+//func GetSubmission(url string) (Submission, error) 
+
+func GetSubreddit(name string) (Subreddit, error) {
+
+	var subreddit Subreddit
+
+	url := fmt.Sprintf("http://reddit.com/r/%s.json", name)
+
+	r, err := Get(url)
+
+	if err != nil {
+		return subreddit, err
+	}
+
+	items := make([]Item, len(r.Data.Children))
+	for i, child := range r.Data.Children {
+		items[i] = child.Data
+	}
+
+	
+
+	subreddit.Name = name
+	subreddit.Items = items
+
+	return subreddit, nil
+}
+
+
 
 func (i Item) String() string {
 	com := ""
@@ -50,9 +94,10 @@ func (i Item) String() string {
 	return fmt.Sprintf("%s%s\n%s", i.Title, com, i.URL)
 }
 
-func Get(reddit string) ([]Item, error) {
-	url := fmt.Sprintf("http://reddit.com/r/%s.json", reddit)
-	resp, err := http.Get(url)
+
+func Get(request string) (*Response, error) {
+	
+	resp, err := http.Get(request)
 	if err != nil {
 		return nil, err
 	}
@@ -65,9 +110,6 @@ func Get(reddit string) ([]Item, error) {
 	if err != nil {
 		return nil, err
 	}
-	items := make([]Item, len(r.Data.Children))
-	for i, child := range r.Data.Children {
-		items[i] = child.Data
-	}
-	return items, nil
+	
+	return r, nil
 }
