@@ -20,15 +20,16 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/nf/reddit"
+	"github.com/scord/reddit"
 )
 
 func main() {
-	items, err := reddit.Get("golang")
+	sub, err := reddit.GetSubreddit("golang")
+
 	if err != nil {
 		log.Fatal(err)
 	}
-	for _, item := range items {
+	for _, item := range sub.Items {
 		fmt.Println(item)
 	}
 }
